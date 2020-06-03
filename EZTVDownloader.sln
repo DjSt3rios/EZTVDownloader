@@ -1,0 +1,28 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29911.84
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EZTVDownloader", "EZTVDownloader\EZTVDownloader.csproj", "{DED4EA74-73D2-4896-9CD6-8EF57C57F59C}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+		ReleaseNew|Any CPU = ReleaseNew|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{DED4EA74-73D2-4896-9CD6-8EF57C57F59C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DED4EA74-73D2-4896-9CD6-8EF57C57F59C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DED4EA74-73D2-4896-9CD6-8EF57C57F59C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DED4EA74-73D2-4896-9CD6-8EF57C57F59C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DED4EA74-73D2-4896-9CD6-8EF57C57F59C}.ReleaseNew|Any CPU.ActiveCfg = ReleaseNew|Any CPU
+		{DED4EA74-73D2-4896-9CD6-8EF57C57F59C}.ReleaseNew|Any CPU.Build.0 = ReleaseNew|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {A53BFA71-CB50-4469-BE4D-36772655EF67}
+	EndGlobalSection
+EndGlobal
