@@ -1,11 +1,22 @@
 # EZTVDownloader
-A simple software that allows you to download entire seasons with a few clicks from EZTV
 
-The first thing you want to do when you first open the software, for the first time only, is to click "Setup magnet links".
-A little window with instructions will open.
+A simple software that allows you to download entire seasons with a few clicks from [EZTV](https://en.wikipedia.org/wiki/EZTV)
 
-After that, select a show through the Show list in the web browser (Click the show you want)
-Then select the seasons you want to download, through the two boxes next to the URL bar.
+## Setting up
 
-In the bottom part of the software, you will find a "Download" button and an option to download the episodes in HD, if they exist.
-That's pretty much it. Happy downloading!
+Do this for the first time running the app:
+
+- Click "Setup magnet links" and a little window with instructions will open.
+- Follow the on-screen instructions.
+
+## Usage
+
+- Select a show through the `Show list in the web browser`.
+
+- Select the seasons you want to download, through the two boxes next to the URL bar.
+
+- Click the download button at the bottom of the app. Note: An option to download the episodes in HD will appear, if they exist.
+
+## Disclaimer
+
+Use this app at your own risk. The developers, the contributors and the users are in no way responsible for the damage, legal or non-legal that you as a user might encounter. We, in no way are to be held liable.
