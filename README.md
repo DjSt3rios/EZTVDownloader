@@ -2,6 +2,15 @@
 
 A simple software that allows you to download entire seasons with a few clicks from [EZTV](https://en.wikipedia.org/wiki/EZTV)
 
+## Compiling with Visual Studio 2019
+
+- Open Visual Studio 2019
+- From the "Get started" section on the right, select "Clone a repository"
+- In repository location, paste this: https://github.com/DjSt3rios/EZTVDownloader.git and click "Clone". Wait for the cloning process to finish.
+- From the "Build" menu, click "Build solution"
+- You should see something like this: EZTVDownloader -> D:\TEZTVDownloader\bin\Debug\EZTVDownloader.exe
+That's where the executable file is at. Locate it and run by double clicking it!
+
 ## Setting up
 
 Do this for the first time running the app:
