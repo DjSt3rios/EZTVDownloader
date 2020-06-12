@@ -6,6 +6,7 @@ using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using EZTVDownloader.Classes;
@@ -17,143 +18,92 @@ namespace EZTVDownloader
 {
     public partial class Form1 : MetroForm
     {
-        private Task downloadTask;
-        private GeckoWebBrowser dummyBrowser = new GeckoWebBrowser();
-        // private IDomHtmlCollection<GeckoElement> links; WIP
-        // private List<EpisodeData> episodes; WIP
+        private List<EpisodeData> episodeList = new List<EpisodeData>();
 
         public Form1()
         {
             InitializeComponent();
-            //Browser.Navigate("https://eztv.io/showlist/");
-            Browser.Navigate("https://eztv.io/shows/449/10-oclock-live/");
-            dummyBrowser.DocumentCompleted += _dummyBrowser_DocumentCompleted;
+            Browser.Navigate("https://eztv.io/showlist/");
         }
 
+        private void addEpisodeData(int season,int episode, string url, bool hd)
+        {
+            EpisodeData newEpisode = new EpisodeData(season, episode, url, hd);
+            if(episodeList.Contains(newEpisode))
+            {
+                if (hd && !newEpisode.HasHD())
+                {
+                    newEpisode.SetURL(url, true);
+                }
+                if (!hd && newEpisode.GetURL() == null)
+                {
+                    newEpisode.SetURL(url);
+                }
+            }
+            else
+            {
+                episodeList.Add(newEpisode);
+            }
+            
+        }
 
         private void download()
         {
-            // Here we begin opening magnet links
-            int episode = 1;
-            int season = int.Parse(SeasonStartNumeric.Value.ToString());
-            var episoderows = dummyBrowser.Document.GetElementsByTagName("a");
+            // Here we are getting all links
+            int seasonStart = int.Parse(SeasonStartNumeric.Value.ToString());
+            int seasonEnd = int.Parse(SeasonEndNumeric.Value.ToString());
+            var links = Browser.Document.GetElementsByTagName("a");
 
-            // Delete non-magnet links
-            for (uint i = episoderows.Length - 1; i > 0; i--)
-            {
-                if ((episoderows[i].ClassName == null) || !episoderows[i].ClassName.Equals("magnet"))
-                {
-                    episoderows[i].ParentNode.RemoveChild(episoderows[i]);
-                }
-            }
+            // Select only magnet links
+            var episodes =
+                from attribute in links
+                where attribute.ClassName.Equals("magnet")
+                select attribute;
+
 
             // Now we begin the real process of finding the magnet links and opening them.
-
-            bool complete = false;
-            bool skip_check = false;
-            while (complete == false)
+            int tempSeason = 0;
+            foreach (var episode in episodes)
             {
-                bool epfound = false;
-                foreach (var row in episoderows)
+                try
                 {
-                    try
+                    tempSeason = getSeasonNumber(episode);
+                    if(tempSeason >= seasonStart && tempSeason <= seasonEnd)
                     {
-                        if (!row.HasAttribute("href")) continue; // This should never happen, but just in case...
-                        if (row.ClassName.Equals("magnet"))
-                        {
-                            if (HDCB.Checked) // Try to find HD Version
-                            {
-                                if (row.GetAttribute("title").Contains(season + "x" + episode.ToString("00")) && row.GetAttribute("title").Contains("720p") || row.GetAttribute("title").Contains("S" + season.ToString("00") + "E" + episode.ToString("00")) && row.GetAttribute("title").Contains("720p"))
-                                {
-                                    if (skip_check)
-                                    {
-                                        AddEpisodeToList("Season: " + season.ToString("00") + " Episode: " + (episode - 1).ToString("00"), false);
-                                    }
-                                    Browser.Navigate(row.GetAttribute("href"));
-                                    AddEpisodeToList("Season: " + season.ToString("00") + " Episode: " + episode.ToString("00"));
-                                    episode++;
-                                    epfound = true;
-                                    skip_check = false;
-                                    break;
-                                }
-                                // HD version not found. Check for normal version
-                                if (row.GetAttribute("title").Contains(season + "x" + episode.ToString("00")) || row.GetAttribute("title").Contains("S" + season.ToString("00") + "E" + episode.ToString("00")))
-                                {
-                                    if (skip_check)
-                                    {
-                                        AddEpisodeToList("Season: " + season.ToString("00") + " Episode: " + (episode - 1).ToString("00"), false);
-                                    }
-                                    Browser.Navigate(row.GetAttribute("href"));
-                                    AddEpisodeToList("Season: " + season.ToString("00") + " Episode: " + episode.ToString("00"));
-                                    episode++;
-                                    epfound = true;
-                                    skip_check = false;
-                                    break;
-                                }
-                            }
-                            else
-                            {
-                                // Looking for Non HD version.
-                                if (row.GetAttribute("title").Contains(season + "x" + episode.ToString("00")) && !row.GetAttribute("title").Contains("720p") || row.GetAttribute("title").Contains("S" + season.ToString("00") + "E" + episode.ToString("00")) && !row.GetAttribute("title").Contains("720p"))
-                                {
-                                    if (skip_check)
-                                    {
-                                        AddEpisodeToList("Season: " + season.ToString("00") + " Episode: " + (episode - 1).ToString("00"), false);
-                                    }
-                                    Browser.Navigate(row.GetAttribute("href"));
-                                    AddEpisodeToList("Season: " + season.ToString("00") + " Episode: " + episode.ToString("00"));
-                                    episode++;
-                                    epfound = true;
-                                    skip_check = false;
-                                    break;
-                                }
-                                // Non HD version not found. We'll get the HD version if available.
-                                if (row.GetAttribute("title").Contains(season + "x" + episode.ToString("00")) || row.GetAttribute("title").Contains("S" + season.ToString("00") + "E" + episode.ToString("00")))
-                                {
-                                    if (skip_check)
-                                    {
-                                        AddEpisodeToList("Season: " + season.ToString("00") + " Episode: " + (episode - 1).ToString("00"), false);
-                                    }
-                                    Browser.Navigate(row.GetAttribute("href"));
-                                    AddEpisodeToList("Season: " + season.ToString("00") + " Episode: " + episode.ToString("00"));
-                                    episode++;
-                                    epfound = true;
-                                    skip_check = false;
-                                    break;
-                                }
-                            }
-
-                        }
-                    }
-                    catch { }
-                }
-                if (!epfound)
-                {
-                    // Episode not found! Search once more, in case 1 ep is missing.
-                    if (skip_check == false)
-                    {
-                        skip_check = true;
-                        episode++;
-                        continue;
-                    }
-                    // Episode not found again. Change season.
-                    season++;
-                    episode = 1;
-                    skip_check = false;
-                    if (season > int.Parse(SeasonEndNumeric.Value.ToString()))
-                    {
-                        complete = true;
+                        addEpisodeData(tempSeason, getEpisodeNumber(episode), episode.GetAttribute("href"), episode.GetAttribute("href").Contains("720p") || episode.GetAttribute("href").Contains("1080p"));
                     }
                 }
+                catch (Exception error)
+                {
+                    Console.WriteLine("Error parsing episode data: " + error.Message);
+                }
+            }
 
+            // Now navigate to the magnet link
+            foreach(var episode in episodeList)
+            {
+                Browser.Navigate(episode.GetURL(HDCB.Checked));
             }
             setControlState(true);
+
+            var newList = episodeList.OrderBy(o => o.GetSeasonNumber()).ThenBy(o => o.GetEpisodeNumber()).ToList();
+            episodeListBox.DataSource = newList;
         }
 
-        private void _dummyBrowser_DocumentCompleted(object sender, Gecko.Events.GeckoDocumentCompletedEventArgs e)
+        private int getSeasonNumber(GeckoHtmlElement element)
         {
-            download();
-            Console.WriteLine("Starting download.");
+            string title = element.GetAttribute("href");
+            var reg = Regex.Match(title, "([Ss]([0-9][0-9])[Ee]([0-9][0-9]))");
+            if(!reg.Success) reg = Regex.Match(title, @"(\d+)[x]([0-9][0-9])");
+            return int.Parse(reg.Groups[2].Value);
+        }
+
+        private int getEpisodeNumber(GeckoHtmlElement element)
+        {
+            string title = element.GetAttribute("href");
+            var reg = Regex.Match(title, "([Ss]([0-9][0-9])[Ee]([0-9][0-9]))");
+            if (!reg.Success) reg = Regex.Match(title, @"(\d+)[x]([0-9][0-9])");
+            return int.Parse(reg.Groups[3].Value);
         }
 
         private void URLTB_KeyDown(object sender, KeyEventArgs e)
@@ -180,6 +130,8 @@ namespace EZTVDownloader
             downloadButton.Enabled = state;
             SeasonStartNumeric.Enabled = state;
             SeasonEndNumeric.Enabled = state;
+            URLTB.Enabled = state;
+            Browser.Enabled = state;
         }
 
         private void downloadButton_Click_1(object sender, EventArgs e)
@@ -196,26 +148,21 @@ namespace EZTVDownloader
                 return;
             }
 
-            var eptable = Browser.Document.GetElementsByClassName("forum_header_noborder");
-            if(eptable.Length == 0) 
+            if(!Browser.Url.AbsoluteUri.Contains("eztv")) 
             {
-                MessageBox.Show("No episodes found. Please select a TV show first.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("Please navigate to EZTV in order to download episodes.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
             setControlState(false);
+            episodeListBox.DataSource = null;
             episodeListBox.Items.Clear();
-            var eps = eptable[0] as GeckoHtmlElement;
-            dummyBrowser.LoadHtml(eps.InnerHtml);
+            episodeList.Clear();
+            download();
         }
 
         private void Browser_Navigating(object sender, Gecko.Events.GeckoNavigatingEventArgs e)
         {
             loadingCircle1.Visible = true;
-        }
-
-        private void AddEpisodeToList(string text, bool successful = true)
-        {
-            episodeListBox.Items.Add(text + (successful ? " - Found" : " - Missing"));
         }
 
         private void BackButton_Click(object sender, EventArgs e)
@@ -234,7 +181,8 @@ namespace EZTVDownloader
             Graphics g = e.Graphics;
 
             var text = episodeListBox.Items[e.Index].ToString();
-            var color = text.Contains("Found") ? Color.DarkGreen : Color.DarkRed;
+            //var color = text.Contains("Found") ? Color.DarkGreen : Color.DarkRed; // WIP
+            var color = Color.DarkGreen;
             g.DrawString(text, e.Font, new SolidBrush(color), new PointF(e.Bounds.X, e.Bounds.Y));
 
             e.DrawFocusRectangle();

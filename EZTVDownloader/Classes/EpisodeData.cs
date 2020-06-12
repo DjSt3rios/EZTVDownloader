@@ -6,43 +6,83 @@ using System.Threading.Tasks;
 
 namespace EZTVDownloader.Classes
 {
-    public class EpisodeData : IEquatable<EpisodeData>
+    public class EpisodeData: IEquatable<EpisodeData>
     {
         private int _season { get; set; }
         private int _episode { get; set; }
         private string _url { get; set; }
-        private bool _HD { get; set; }
+        private string _hdurl { get; set; }
 
         public EpisodeData(int season, int episode, string url, bool HD = false)
         {
             _season = season;
             _episode = episode;
-            _url = url;
-            _HD = HD;
+            if(HD)
+            {
+                _hdurl = url;
+            }
+            else
+            {
+                _url = url;
+            }
         }
 
-        public override bool Equals(object obj)
+        public void SetURL(string url, bool HDURL = false)
         {
-            return Equals(obj as EpisodeData);
+            if(HDURL)
+            {
+                _hdurl = url;
+            }
+            else
+            {
+                _url = url;
+            }
         }
 
-        public bool Equals(EpisodeData other)
+        public bool HasHD()
         {
-            return other != null &&
-                   _season == other._season &&
-                   _episode == other._episode &&
-                   _url == other._url &&
-                   _HD == other._HD;
+            return _hdurl != null;
+        }
+
+        public string GetURL(bool preferHD = false)
+        {
+            if(preferHD)
+            {
+                if(_hdurl != null)
+                {
+                    return _hdurl;
+                }
+            }
+            return _url == null ? _hdurl : _url;
+        }
+
+        public int GetSeasonNumber()
+        {
+            return _season;
+        }
+
+        public int GetEpisodeNumber()
+        {
+            return _episode;
         }
 
         public override int GetHashCode()
         {
-            int hashCode = -554730225;
+            int hashCode = 1758677558;
             hashCode = hashCode * -1521134295 + _season.GetHashCode();
             hashCode = hashCode * -1521134295 + _episode.GetHashCode();
-            hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(_url);
-            hashCode = hashCode * -1521134295 + _HD.GetHashCode();
             return hashCode;
+        }
+
+        public bool Equals(EpisodeData other)
+        {
+            return _season == other._season &&
+                   _episode == other._episode;
+        }
+
+        public override string ToString()
+        {
+            return "S" + _season + "E" + _episode;
         }
     }
 }
