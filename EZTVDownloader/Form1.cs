@@ -23,7 +23,7 @@ namespace EZTVDownloader
         public Form1()
         {
             InitializeComponent();
-            Browser.Navigate("https://eztv.io/showlist/");
+            Browser.Navigate("https://eztv.re/showlist/");
         }
 
         private void addEpisodeData(int season,int episode, string url, bool hd)

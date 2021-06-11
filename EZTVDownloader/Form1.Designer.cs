@@ -53,7 +53,7 @@
             this.URLTB.Name = "URLTB";
             this.URLTB.Size = new System.Drawing.Size(469, 20);
             this.URLTB.TabIndex = 0;
-            this.URLTB.Text = "https://eztv.io";
+            this.URLTB.Text = "https://eztv.re";
             this.URLTB.KeyDown += new System.Windows.Forms.KeyEventHandler(this.URLTB_KeyDown);
             // 
             // label3
