@@ -19,7 +19,7 @@ namespace EZTVDownloader
             Application.SetCompatibleTextRenderingDefault(false);
             
             // Initialize Firefox
-            Xpcom.Initialize("Firefox");
+            Xpcom.Initialize("../../Firefox");
             string sUserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:60.0) Gecko/20100101 Firefox/66.0";
             GeckoPreferences.Default["general.useragent.override"] = sUserAgent;
 
