@@ -23,7 +23,15 @@ namespace EZTVDownloader
         public Form1()
         {
             InitializeComponent();
-            Browser.Navigate("https://eztv.re/showlist/");
+            try
+            {
+                Browser.Navigate(Properties.Settings.Default.InitialURL);
+            }
+            catch
+            {
+                MessageBox.Show("There was a problem navigating to your configured URL, please make sure it's correct.\nEnsure you include the HTTP/HTTPS protocol.","Navigation error",MessageBoxButtons.OK,MessageBoxIcon.Error);
+            }
+            
         }
 
         private void addEpisodeData(int season,int episode, string url, bool hd)
@@ -213,6 +221,35 @@ namespace EZTVDownloader
         {
             MessageBox.Show("Please select your client and check the 'Remember my choice' checkbox. You only have to do this once!");
             Browser.Navigate("magnet:");
+        }
+
+        private void settingsBtn_Click(object sender, EventArgs e)
+        {
+            if(new SettingsForm().ShowDialog() == DialogResult.OK)
+            {
+                Properties.Settings.Default.Save();
+            }
+            else
+            {
+                Properties.Settings.Default.Reload();
+            }
+        }
+
+        private void reloadBtn_Click(object sender, EventArgs e)
+        {
+            Browser.Reload();
+        }
+
+        private void homeBtn_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                Browser.Navigate(Properties.Settings.Default.InitialURL);
+            }
+            catch
+            {
+                MessageBox.Show("There was a problem navigating to your configured URL, please make sure it's correct.\nEnsure you include the HTTP/HTTPS protocol.", "Navigation error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
     }
 }
